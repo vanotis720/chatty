@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "441196816919",
+    "project_id": "chatty-53435",
+    "storage_bucket": "chatty-53435.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441196816919:android:ce2355af3ccb70ec9bca52",
+        "android_client_info": {
+          "package_name": "com.vanotis720.chatty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441196816919-5ohdnjc70apcu15so0oofk8js0oqmi5e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbQGPSjicZX7TUt7hbhZL79gMVuyEMKz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441196816919-5ohdnjc70apcu15so0oofk8js0oqmi5e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "441196816919-9p5pj99njfrsjm9qtkbnuu94ufeic8tv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vanotis720.chatty"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

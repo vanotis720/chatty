@@ -1,33 +1,36 @@
 import React, { useState } from "react";
-import { Dimensions, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { validateEmail } from "../../utils/validation";
 import { colors } from "../../styles/colors";
+import auth from '@react-native-firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SignupScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
-    const [email, setEmail] = useState();
-    const [username, setUserName] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
 
     const handleSignUp = () => {
         setIsLoading(true);
-
-        if (!validateEmail(email)) {
-            alert('email invalide');
-            setIsLoading(false);
-            return;
-        }
+        setError(null);
 
         if (username.length < 3) {
-            alert('email invalide');
+            setError('Cet nom d\'utilisateur est trop court !');
             setIsLoading(false);
             return;
         }
 
-        if (password.length() < 8) {
-            alert('Votre mot de passe doit avoir plus de caracteres');
+        if (!validateEmail(email)) {
+            setError('Cette adresse e-mail n\'est pas valide !');
+            setIsLoading(false);
+            return;
+        }
+
+        if (password.length < 8) {
+            setError('Votre mot de passe doit avoir plus de caracteres');
             setIsLoading(false);
             return;
         }
@@ -40,11 +43,11 @@ export default function SignupScreen({ navigation }) {
             })
             .catch(error => {
                 if (error.code === 'auth/email-already-in-use') {
-                    alert('That email address is already in use!');
+                    setError('Oops! Cette adresse email est déjà utilisée!');
                 }
 
                 if (error.code === 'auth/invalid-email') {
-                    alert('That email address is invalid!');
+                    alert('Cet nom d\'utilisateur est trop court !');
                 }
                 console.error(error);
                 setIsLoading(false);
@@ -56,7 +59,7 @@ export default function SignupScreen({ navigation }) {
                 <Text style={styles.title}>Créer un compte</Text>
                 <View style={styles.loginSection}>
                     <Text style={styles.subtitle}>Tu as déjà un compte ? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Signin')}>
                         <Text style={[styles.subtitle, { color: colors.primary }]}>S'identifier</Text>
                     </TouchableOpacity>
                 </View>
@@ -65,7 +68,7 @@ export default function SignupScreen({ navigation }) {
                 <TextInput
                     placeholder="Nom d'utilisateur"
                     value={username}
-                    onChangeText={setUserName}
+                    onChangeText={setUsername}
                     style={styles.input}
                 />
                 <TextInput
@@ -73,6 +76,7 @@ export default function SignupScreen({ navigation }) {
                     value={email}
                     onChangeText={setEmail}
                     style={styles.input}
+                    keyboardType='email-address'
                 />
                 <TextInput
                     placeholder="Mot de passe"
@@ -82,11 +86,16 @@ export default function SignupScreen({ navigation }) {
                     secureTextEntry
                 />
 
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+
                 <TouchableOpacity
                     style={styles.button}
                     onPress={handleSignUp}
                 >
-                    <Text style={styles.buttonText}>Continuer</Text>
+                    {
+                        isLoading ? <ActivityIndicator color={colors.white} size={'large'} /> :
+                            <Text style={styles.buttonText}>Continuer</Text>
+                    }
                 </TouchableOpacity>
             </View>
             <StatusBar style="auto" />
@@ -130,6 +139,11 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         borderRadius: 10,
         paddingHorizontal: 20,
+    },
+    error: {
+        marginVertical: 10,
+        color: colors.danger,
+        fontWeight: '400',
     },
     button: {
         height: 50,

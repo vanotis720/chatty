@@ -3,22 +3,30 @@ import auth from '@react-native-firebase/auth';
 import AppNavigation from './src/navigations/AppNavigation';
 import AuthNavigation from './src/navigations/AuthNavigation';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { colors } from './src/styles/colors';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
+
 
 export default function App() {
 	const [initializing, setInitializing] = useState(true);
 	const [user, setUser] = useState();
 
+	const appIsReady = async () => {
+		await SplashScreen.hideAsync();
+	}
+
 	useEffect(() => {
 		const subscriber = auth().onAuthStateChanged((user) => {
 			setUser(user);
+			console.log('here');
+			appIsReady();
 			if (initializing) setInitializing(false);
 		});
 		return subscriber;
 	}, []);
 
-	if (initializing) return <ActivityIndicator color={colors.primary} />;
+	if (initializing) return null;
 
 	return (
 		<NavigationContainer>

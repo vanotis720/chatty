@@ -1,26 +1,29 @@
 import React, { useState } from "react";
-import { Dimensions, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { validateEmail } from "../../utils/validation";
 import { colors } from "../../styles/colors";
+import auth from '@react-native-firebase/auth';
 
 const { width, height } = Dimensions.get('window');
 
-export default function SigninScreen() {
+export default function SigninScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);
 
     const handleSignIn = () => {
         setIsLoading(true);
+        setError(null);
 
         if (!validateEmail(email)) {
-            alert('email invalide');
+            setError('Cette adresse e-mail n\'est pas valide !');
             setIsLoading(false);
             return;
         }
 
-        if (password.length() < 8) {
-            alert('Votre mot de passe doit avoir plus de caracteres');
+        if (password.length < 8) {
+            setError('Votre mot de passe doit avoir plus de caracteres');
             setIsLoading(false);
             return;
         }
@@ -33,11 +36,11 @@ export default function SigninScreen() {
             })
             .catch(error => {
                 if (error.code === 'auth/invalid-email') {
-                    alert('That email address is invalid!');
+                    setError('Cette adresse e-mail n\'est pas valide !');
                 }
-                alert('identifiants/email invalide');
+                setError('Identifiants et/ou mot de passe invalide');
 
-                console.error(error);
+                console.log(error);
                 setIsLoading(false);
             });
     }
@@ -47,7 +50,7 @@ export default function SigninScreen() {
                 <Text style={styles.title}>Se connecter</Text>
                 <View style={styles.loginSection}>
                     <Text style={styles.subtitle}>Tu n'as pas encore de compte ? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Signin')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
                         <Text style={[styles.subtitle, { color: colors.primary }]}>S'inscrire</Text>
                     </TouchableOpacity>
                 </View>
@@ -58,6 +61,7 @@ export default function SigninScreen() {
                     value={email}
                     onChangeText={setEmail}
                     style={styles.input}
+                    keyboardType='email-address'
                 />
                 <TextInput
                     placeholder="Mot de passe"
@@ -67,11 +71,16 @@ export default function SigninScreen() {
                     secureTextEntry
                 />
 
+                {error ? <Text style={styles.error}>{error}</Text> : null}
+
                 <TouchableOpacity
                     style={styles.button}
                     onPress={handleSignIn}
                 >
-                    <Text style={styles.buttonText}>Continuer</Text>
+                    {
+                        isLoading ? <ActivityIndicator color={colors.white} size={'large'} /> :
+                            <Text style={styles.buttonText}>Continuer</Text>
+                    }
                 </TouchableOpacity>
             </View>
             <StatusBar style="auto" />
@@ -115,6 +124,11 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         borderRadius: 10,
         paddingHorizontal: 20,
+    },
+    error: {
+        marginVertical: 10,
+        color: colors.danger,
+        fontWeight: '400',
     },
     button: {
         height: 50,
